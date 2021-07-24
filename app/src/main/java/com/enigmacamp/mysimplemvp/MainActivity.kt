@@ -1,26 +1,32 @@
 package com.enigmacamp.mysimplemvp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.enigmacamp.mysimplemvp.MainActivityContract.AppView
 import com.enigmacamp.mysimplemvp.databinding.ActivityMainBinding
-import kotlin.math.log
 
-class MainActivity : AppCompatActivity(), View {
-    private val TAG = "MainActivity"
+class MainActivity : AppCompatActivity(), AppView {
+
     private lateinit var mainBinding: ActivityMainBinding
     private lateinit var mainPresenter: MainActivityPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainPresenter = MainActivityPresenter(this)
+
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
+        attachPresenter()
         mainBinding.apply {
             updateButton.setOnClickListener {
-                mainPresenter.updateInfo(Customer("Donny"))
+                mainPresenter.start()
             }
         }
+    }
+
+    override fun attachPresenter() {
+        mainPresenter = MainActivityPresenter()
+        mainPresenter.attachView(this)
     }
 
     override fun hideProgressBar() {
@@ -31,5 +37,18 @@ class MainActivity : AppCompatActivity(), View {
     override fun showProgressBar() {
         Log.d(TAG, "showProgressBar: ")
         mainBinding.updateButton.isEnabled = false
+    }
+
+    override fun showCustomerInfo(customer: Customer) {
+        Log.d(TAG, "Customer: ${customer}")
+    }
+
+    override fun onDestroy() {
+        mainPresenter.detachView()
+        super.onDestroy()
+    }
+
+    companion object {
+        private val TAG = "MainActivity"
     }
 }

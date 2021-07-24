@@ -7,7 +7,7 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
-    buildFeatures{
+    buildFeatures {
         viewBinding true
     }
     defaultConfig {
@@ -20,6 +20,14 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    sourceSets {
+        main {
+            res.srcDirs = [
+                    'src/main/res/layout/activity',
+                    'src/main/res'
+            ]
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
