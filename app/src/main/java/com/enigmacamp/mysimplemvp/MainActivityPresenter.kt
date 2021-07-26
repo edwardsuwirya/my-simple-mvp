@@ -12,25 +12,28 @@ class MainActivityPresenter : MainActivityContract.AppPresenter {
     }
 
     override fun detachView() {
+        Log.d(TAG, "onDestroy: ")
         mainActivityView = null
     }
 
     override fun start() {
-        updateInfo(getCustomerFromRepository())
+        updateInfo()
     }
 
     private fun getCustomerFromRepository() = Customer("Donny")
 
-    private fun updateInfo(customer: Customer) {
-
+    private fun updateInfo() {
+        var customer: Customer? = null
         mainActivityView?.apply {
             showProgressBar()
             Handler(Looper.getMainLooper()).postDelayed(
                 {
+                    customer = getCustomerFromRepository()
                     hideProgressBar()
-                    showCustomerInfo(customer)
+                    showCustomerInfo(customer ?: Customer(""))
                 }, 2000
             )
+
         }
     }
 
