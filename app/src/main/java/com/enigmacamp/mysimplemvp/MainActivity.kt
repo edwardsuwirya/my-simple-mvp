@@ -1,64 +1,67 @@
 package com.enigmacamp.mysimplemvp
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.enigmacamp.mysimplemvp.MainActivityContract.AppView
 import com.enigmacamp.mysimplemvp.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity(), AppView {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
-    private lateinit var mainPresenter: MainActivityPresenter
-    private var customer: Customer? = null
+    private lateinit var viewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
-        attachPresenter()
-        Log.d(TAG, "Customer On Create: ${customer}")
+        initViewModel()
+        subscribe()
         mainBinding.apply {
             updateButton.setOnClickListener {
-                mainPresenter.start()
+                showProgressBar()
+                viewModel.start()
             }
         }
     }
 
-    override fun attachPresenter() {
-        mainPresenter = MainActivityPresenter()
-        mainPresenter.attachView(this)
+    private fun initViewModel() {
+        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
     }
 
-    override fun hideProgressBar() {
+    private fun subscribe() {
+        viewModel.customerLiveData.observe(this, {
+            hideProgressBar()
+            showCustomerInfo(it)
+        })
+    }
+
+    private fun hideProgressBar() {
         Log.d(TAG, "hideProgressBar: ")
         mainBinding.updateButton.isEnabled = true
     }
 
-    override fun showProgressBar() {
+    private fun showProgressBar() {
         Log.d(TAG, "showProgressBar: ")
         mainBinding.updateButton.isEnabled = false
     }
 
-    override fun showCustomerInfo(newCustomer: Customer) {
-        customer = newCustomer
-        Intent(this@MainActivity, NextActivity::class.java).also {
-            startActivity(it)
-        }
-        finish()
-        Log.d(TAG, "Customer: ${customer}")
+    private fun showCustomerInfo(newCustomer: Customer) {
+//        Intent(this@MainActivity, NextActivity::class.java).also {
+//            startActivity(it)
+//        }
+//        finish()
+        Log.d(TAG, "Customer: ${newCustomer}")
     }
 
     override fun onDestroy() {
-        mainPresenter.detachView()
         Log.d(TAG, "onDestroy: ")
         super.onDestroy()
     }
 
     companion object {
-        private val TAG = "MainActivity"
+        private val TAG = "MainActivity ${BuildConfig.APPLICATION_ID} run on ${BuildConfig.BASE_URL}"
     }
 }

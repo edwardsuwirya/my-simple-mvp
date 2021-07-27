@@ -41,15 +41,43 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    flavorDimensions 'environment', 'appVersion'
+    productFlavors {
+        sit {
+            dimension 'environment'
+            buildConfigField("String", "BASE_URL", "\"http://development-server\"")
+        }
+        uat {
+            dimension 'environment'
+            buildConfigField("String", "BASE_URL", "\"http://uat-server\"")
+        }
+        production {
+            dimension 'environment'
+            buildConfigField("String", "BASE_URL", "\"http://production-server\"")
+        }
+        trial {
+            manifestPlaceholders applicationName: '@string/app_name_trial'
+            dimension 'appVersion'
+            applicationIdSuffix '.trial'
+            versionNameSuffix '-trial'
+        }
+        full {
+            manifestPlaceholders applicationName: '@string/app_name'
+            dimension 'appVersion'
+            applicationIdSuffix '.full'
+            versionNameSuffix '-full'
+        }
+    }
 }
 
 dependencies {
-
+    implementation "androidx.fragment:fragment-ktx:1.3.6"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.1'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
